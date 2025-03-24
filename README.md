@@ -15,8 +15,6 @@ If you are using the NewRecruit Webpage, you can use the following Paragraph to 
 
 
 <h2>How to work with the NewRecruit-Point-Calculator</h2>
-This is the basic look of the Application:
-![image](https://github.com/user-attachments/assets/36135e79-09c5-4d2b-831a-05011d8d754d)
 
 The Calculator is split in the following columns:
 
