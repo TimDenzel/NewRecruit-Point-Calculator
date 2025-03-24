@@ -1,5 +1,4 @@
 <h1>How to use the NewRecruit-Point-Calculator.exe for Warhammer Armies Project</h1>
-Discord Contact for Bugs: denzel1410
 
 This Tool was developed, so Users of the NewRecruit Page can calculate the Battle-Result and -Losses easier.
 You can add your Army manually by opening the Application and, using the 'Add Row'-Button, add each of your Units to the Calculator.
@@ -51,3 +50,8 @@ Above the calculator is the Menu-Bar. It currently only provides a File-Menu wit
 | **Import File** | Loads a .json which has been exported from NewRecruit Warhammer Armies Project |
 | **Export File** | Exports the currently displayed army  to a custom .json for further processing if needed. This is final, as you currently cant load the .json back into the NewRecruit-Point-Calculator.exe |
 | **Exit** | Exits the Application |
+
+<h2>Contact</h2>
+
+Discord Contact for Bugs: denzel1410
+This is a fan-made application. All images and logos are owned by their respective companies and only used in a non-commercial way.
