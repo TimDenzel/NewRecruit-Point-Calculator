@@ -670,7 +670,7 @@ def setup_point_calculator_header(content_frame):
 
 
 # Header-Row for the point-calculator
-def setup_unit_row(row, unit: UnitObject, name_entry_state="normal"):
+def setup_unit_row(row, unit: UnitObject):
     vcmd = (root.register(validate_input), "%S", "%P")
 
     unit_name_entry = ctk.CTkEntry(calculator_frame, border_width=1)
@@ -724,7 +724,6 @@ def setup_unit_row(row, unit: UnitObject, name_entry_state="normal"):
     delete_row_button.grid(row=row, column=9, padx=(delete_row_button.cget("width")) / 2, pady=5, sticky="ew")
 
     unit_name_entry.insert(0, unit.name)
-    unit_name_entry.configure(state=name_entry_state)
     unit_points_entry.insert(0, str(unit.points).rstrip('0').rstrip('.'))
     unit_starting_wound_or_model_entry.insert(0, str(unit.starting_wounds_or_models))
     unit_lost_wound_or_model_entry.insert(0, str(unit.lost_wounds_or_models))
@@ -859,13 +858,13 @@ def setup_control_frame(control_frame):
                                                                   UnitObject()))
     add_row_button.grid(row=0, column=0, padx=2.5, pady=0, sticky="w")
 
-    reset_button = ctk.CTkButton(control_frame, text="Reset", height=button_height, width=button_width,
-                                 command=reset_grid)
-    reset_button.grid(row=0, column=1, padx=2.5, pady=0, sticky="w")
-
     load_to_units_button = ctk.CTkButton(control_frame, text="Load Army", height=button_height, width=button_width,
                                          command=lambda: load_custom_army_to_units(calculator_frame))
-    load_to_units_button.grid(row=0, column=2, padx=2.5, sticky="w")
+    load_to_units_button.grid(row=0, column=1, padx=2.5, sticky="w")
+
+    reset_button = ctk.CTkButton(control_frame, text="Reset", fg_color="orange", text_color="black", height=button_height, width=button_width,
+                                 command=reset_grid)
+    reset_button.grid(row=0, column=2, padx=2.5, pady=0, sticky="w")
 
     # Middle
     army_title_label = ctk.CTkLabel(control_frame, text="Army: ")
