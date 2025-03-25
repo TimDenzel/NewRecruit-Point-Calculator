@@ -58,21 +58,21 @@ class ArmyDetailDialog:
         padx = 5
         self.dialog_window.lift()
         self.dialog_window.grab_set()
-        self.custom_army_name = ctk.CTkLabel(self.dialog_window, text="Army-Name:")
+        self.custom_army_name = ctk.CTkLabel(self.dialog_window, text="Army-Name:", bg_color="#242424")
         self.custom_army_name.grid(row=0, column=0, padx=padx, pady=pady, sticky="ew")
 
-        self.custom_army_points = ctk.CTkLabel(self.dialog_window, text="Army Point-Limit:")
+        self.custom_army_points = ctk.CTkLabel(self.dialog_window, text="Army Point-Limit:", bg_color="#242424")
         self.custom_army_points.grid(row=1, column=0, padx=padx, pady=pady, sticky="ew")
 
-        self.army_name_entry = ctk.CTkEntry(self.dialog_window)
+        self.army_name_entry = ctk.CTkEntry(self.dialog_window, bg_color="#242424")
         self.army_name_entry.insert(0, army_name.get())
         self.army_name_entry.grid(row=0, column=1, padx=padx, pady=pady, sticky="ew")
 
-        self.army_point_limit_entry = ctk.CTkEntry(self.dialog_window)
+        self.army_point_limit_entry = ctk.CTkEntry(self.dialog_window, bg_color="#242424")
         self.army_point_limit_entry.insert(0, army_points.get())
         self.army_point_limit_entry.grid(row=1, column=1, padx=padx, pady=pady, sticky="ew")
 
-        self.button_frame = ctk.CTkFrame(self.dialog_window)
+        self.button_frame = ctk.CTkFrame(self.dialog_window, fg_color="#242424")
         self.ok_button = ctk.CTkButton(self.button_frame, text="OK", command=self.on_ok)
         self.ok_button.pack(side="left", padx=10, pady=0)
 
