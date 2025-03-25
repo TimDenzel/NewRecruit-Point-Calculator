@@ -282,7 +282,7 @@ def load_army_from_savefile():
 
                 row_index = 1
                 for name, unit in units.items():
-                    setup_unit_row(row_index, unit, "disabled")
+                    setup_unit_row(row_index, unit)
                     row_index += 1
         else:
             messagebox.showerror("Error", "Invalid File-Type!")
@@ -313,7 +313,7 @@ def convert_army(json_data):
     print(f"{spent_points} / {army_points.get()}")
     row_index = 1
     for name, unit in units.items():
-        setup_unit_row(row_index, unit, "disabled")
+        setup_unit_row(row_index, unit)
         row_index += 1
 
 
@@ -563,7 +563,7 @@ def setup_window():
     root.wm_iconbitmap(icon_path)
     # Sets application non-resizable
     root.resizable(False, False)
-    window_width = 1030
+    window_width = 1000
     window_height = 500
 
     # Calculate window position to center application on screen
@@ -619,6 +619,7 @@ def setup_window():
     calculator_frame.grid_columnconfigure(7, weight=1)
     calculator_frame.grid_columnconfigure(8, weight=1)
     calculator_frame.grid_columnconfigure(9, weight=1)
+    calculator_frame.grid_columnconfigure(10, weight=1)
 
     setup_point_calculator_header(calculator_frame)
     setup_unit_row(1, UnitObject())
@@ -665,8 +666,11 @@ def setup_point_calculator_header(content_frame):
     unit_battle_standard_label = ctk.CTkLabel(content_frame, text="Battle Standard lost?")
     unit_battle_standard_label.grid(row=0, column=8, padx=5, pady=5)
 
+    unit_points_lost = ctk.CTkLabel(content_frame, text="Points lost")
+    unit_points_lost.grid(row=0, column=9, padx=5, pady=5, sticky="w")
+
     delete_row_label = ctk.CTkLabel(content_frame, text="Delete Row")
-    delete_row_label.grid(row=0, column=9, padx=5, pady=5, sticky="ew")
+    delete_row_label.grid(row=0, column=10, padx=5, pady=5, sticky="ew")
 
 
 # Header-Row for the point-calculator
@@ -683,18 +687,18 @@ def setup_unit_row(row, unit: UnitObject):
     unit_general_checkbox.grid(row=row, column=2, padx=(unit_general_checkbox.cget("width")) / 2, pady=5)
     unit_general_checkbox._name = "unit_general_checkbox"
 
-    unit_points_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd)
+    unit_points_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd, width=50)
     unit_points_entry.grid(row=row, column=3, padx=5, pady=5)
     unit_points_entry.bind("<KeyRelease>", lambda event: on_entry_change(event, unit.name, unit_points_entry))
     unit_points_entry._name = "unit_points_entry"
 
-    unit_starting_wound_or_model_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd)
+    unit_starting_wound_or_model_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd, width=120)
     unit_starting_wound_or_model_entry.grid(row=row, column=4, padx=5, pady=5)
     unit_starting_wound_or_model_entry.bind("<KeyRelease>", lambda event: on_entry_change(event, unit.name,
                                                                                           unit_starting_wound_or_model_entry))
     unit_starting_wound_or_model_entry._name = "unit_starting_wound_or_model_entry"
 
-    unit_lost_wound_or_model_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd)
+    unit_lost_wound_or_model_entry = ctk.CTkEntry(calculator_frame, border_width=1, validatecommand=vcmd, width=120)
     unit_lost_wound_or_model_entry.grid(row=row, column=5, padx=5, pady=5)
     unit_lost_wound_or_model_entry.bind("<KeyRelease>", lambda event: on_entry_change(event, unit.name,
                                                                                       unit_lost_wound_or_model_entry))
@@ -719,14 +723,27 @@ def setup_unit_row(row, unit: UnitObject):
                                        pady=5)
     unit_battle_standard_checkbox._name = "unit_battle_standard_checkbox"
 
+    unit_points_lost_var = ctk.StringVar(value=str(unit.points_lost))
+    unit_points_lost_entry = ctk.CTkEntry(calculator_frame, border_width=1, width=60, textvariable=unit_points_lost_var)
+    unit_points_lost_entry.grid(row=row, column=9, padx=5, pady=5)
+    unit_points_lost_entry._name = "unit_points_lost_entry"
+
+    unit.points_lost_var = unit_points_lost_var
+
     delete_row_button = ctk.CTkButton(calculator_frame, text="X", width=25,
                                       command=lambda: delete_row_from_grid(row, calculator_frame))
-    delete_row_button.grid(row=row, column=9, padx=(delete_row_button.cget("width")) / 2, pady=5, sticky="ew")
+    delete_row_button.grid(row=row, column=10, padx=(unit_points_lost_entry.cget("width") / 2), pady=5, sticky="ew")
 
     unit_name_entry.insert(0, unit.name)
-    unit_points_entry.insert(0, str(unit.points).rstrip('0').rstrip('.'))
+    if not unit.points == 0:
+        unit_points_entry.insert(0, str(unit.points).rstrip('0').rstrip('.'))
+    else:
+        unit_points_entry.insert(0, "0")
+
     unit_starting_wound_or_model_entry.insert(0, str(unit.starting_wounds_or_models))
     unit_lost_wound_or_model_entry.insert(0, str(unit.lost_wounds_or_models))
+
+
 
     if unit.is_general:
         unit_general_checkbox.select()
@@ -764,6 +781,7 @@ def entry_update_unit(unit_name, entry: ctk.CTkEntry):
                 setattr(units[unit_name], "points", int(entry.get()))
             else:
                 setattr(units[unit_name], "points", 0)
+
     calculate_points()
 
 
@@ -788,8 +806,14 @@ def calculate_points():
     lost_points_total.set("0")
     for unit in units.values():
         unit.update_lost_points()
-        current_value = lost_points_total.get().rstrip('0').rstrip('.')
-        lost_points_total.set(str((current_value + unit.points_lost)).rstrip('0').rstrip('.'))
+
+        if hasattr(unit, "points_lost_var"):
+            unit.points_lost_var.set(str(unit.points_lost))
+        if not lost_points_total.get() == "0":
+            current_value = lost_points_total.get().rstrip('0').rstrip('.')
+        else:
+            current_value = 0
+        lost_points_total.set(str(int(current_value) + int(unit.points_lost)).rstrip('0').rstrip('.'))
 
 
 def on_entry_change(event, unit_name, widget):
@@ -862,7 +886,8 @@ def setup_control_frame(control_frame):
                                          command=lambda: load_custom_army_to_units(calculator_frame))
     load_to_units_button.grid(row=0, column=1, padx=2.5, sticky="w")
 
-    reset_button = ctk.CTkButton(control_frame, text="Reset", fg_color="orange", text_color="black", height=button_height, width=button_width,
+    reset_button = ctk.CTkButton(control_frame, text="Reset", fg_color="orange", text_color="black",
+                                 height=button_height, width=button_width,
                                  command=reset_grid)
     reset_button.grid(row=0, column=2, padx=2.5, pady=0, sticky="w")
 
@@ -905,6 +930,8 @@ def load_custom_army_to_units(frame):
         widgets_in_row = sorted(widgets_in_row, key=lambda w: w.grid_info()["column"])
 
         entry_widgets = [w for w in widgets_in_row if isinstance(w, ctk.CTkEntry)]
+        if entry_widgets:
+            entry_widgets.pop()
         checkbox_widgets = [w for w in widgets_in_row if isinstance(w, ctk.CTkCheckBox)]
 
         if len(entry_widgets) == 4 and len(checkbox_widgets) == 4:
