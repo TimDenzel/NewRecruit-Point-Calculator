@@ -4,7 +4,7 @@ import os
 import sys
 import tkinter as tk
 import customtkinter as ctk
-from tkinter import filedialog, messagebox
+from tkinter import filedialog, messagebox, simpledialog
 from pathlib import Path
 from collections import OrderedDict
 from CTkMenuBar import *
@@ -25,15 +25,77 @@ save_destination_path = ""
 root = ctk.CTk()
 calculator_frame = ctk.CTkFrame(root)
 army_name = ctk.StringVar(value="")
-current_points = ctk.IntVar(value=0)
-army_points = ctk.IntVar(value=0)
-lost_points_total = ctk.IntVar(value=0)
+spent_points = ctk.StringVar(value="0")
+army_points = ctk.StringVar(value="0")
+lost_points_total = ctk.StringVar(value="0")
 entry_after_ids = {}
 
 if getattr(sys, 'frozen', False):
     icon_path = os.path.join(sys._MEIPASS, 'newRecruit.ico')
 else:
     icon_path = 'newRecruit.ico'
+
+
+class ArmyDetailDialog:
+    def __init__(self):
+        self.parent = root
+        self.title = "Custom Army Options"
+        self.result = None
+
+        self.dialog_window = ctk.CTkToplevel(self.parent)
+        self.dialog_window.title(self.title)
+        window_width = 350
+        window_height = 150
+        screen_width = self.dialog_window.winfo_screenwidth()
+        screen_height = self.dialog_window.winfo_screenheight()
+
+        x_position = (screen_width - window_width) // 2
+        y_position = (screen_height - window_height) // 2
+
+        self.dialog_window.geometry(f"{window_width}x{window_height}+{x_position}+{y_position}")
+
+        pady = 5
+        padx = 5
+        self.dialog_window.lift()
+        self.dialog_window.grab_set()
+        self.custom_army_name = ctk.CTkLabel(self.dialog_window, text="Army-Name:")
+        self.custom_army_name.grid(row=0, column=0, padx=padx, pady=pady, sticky="ew")
+
+        self.custom_army_points = ctk.CTkLabel(self.dialog_window, text="Army Point-Limit:")
+        self.custom_army_points.grid(row=1, column=0, padx=padx, pady=pady, sticky="ew")
+
+        self.army_name_entry = ctk.CTkEntry(self.dialog_window)
+        self.army_name_entry.insert(0, army_name.get())
+        self.army_name_entry.grid(row=0, column=1, padx=padx, pady=pady, sticky="ew")
+
+        self.army_point_limit_entry = ctk.CTkEntry(self.dialog_window)
+        self.army_point_limit_entry.insert(0, army_points.get())
+        self.army_point_limit_entry.grid(row=1, column=1, padx=padx, pady=pady, sticky="ew")
+
+        self.button_frame = ctk.CTkFrame(self.dialog_window)
+        self.ok_button = ctk.CTkButton(self.button_frame, text="OK", command=self.on_ok)
+        self.ok_button.pack(side="left", padx=10, pady=0)
+
+        self.cancel_button = ctk.CTkButton(self.button_frame, text="Cancel", command=self.on_cancel)
+        self.cancel_button.pack(side="left", padx=10, pady=0)
+        self.button_frame.grid(row=2, column=0, columnspan=2, pady=5)
+
+        self.dialog_window.grid_columnconfigure(0, weight=1)
+        self.dialog_window.grid_columnconfigure(1, weight=1)
+
+        self.dialog_window.grid_rowconfigure(0, weight=0)
+        self.dialog_window.grid_rowconfigure(1, weight=0)
+        self.dialog_window.grid_rowconfigure(2, weight=1)
+
+    def on_ok(self):
+        """Wird aufgerufen, wenn OK gedrückt wird"""
+        self.result = (self.army_name_entry.get(), self.army_point_limit_entry.get())
+        self.dialog_window.destroy()
+
+    def on_cancel(self):
+        """Wird aufgerufen, wenn Cancel gedrückt wird"""
+        self.result = None
+        self.dialog_window.destroy()
 
 
 class UnitObject:
@@ -67,12 +129,12 @@ class UnitObject:
         if self.is_general and self.lost_wounds_or_models == self.starting_wounds_or_models:
             self.points_lost += 100
 
-        if self.lost_wounds_or_models == self.starting_wounds_or_models:
-            self.points_lost += self.points
-        elif self.is_fleeing and self.lost_wounds_or_models >= self.starting_wounds_or_models / 2:
-            self.points_lost += 0.75 * self.points
-        elif self.lost_wounds_or_models >= self.starting_wounds_or_models / 2:
-            self.points_lost += 0.5 * self.points
+        if int(self.lost_wounds_or_models) == int(self.starting_wounds_or_models):
+            self.points_lost += int(self.points)
+        elif self.is_fleeing and self.lost_wounds_or_models >= int(self.starting_wounds_or_models) / 2:
+            self.points_lost += 0.75 * int(self.points)
+        elif int(self.lost_wounds_or_models) >= int(self.starting_wounds_or_models) / 2:
+            self.points_lost += 0.5 * int(self.points)
 
         if self.standard_lost:
             self.points_lost += 25
@@ -134,7 +196,7 @@ def open_savefile():
 
 
 def load_file_from_new_recruit():
-    global current_points
+    global spent_points
     global army_points
     global army_name
     # Setup for every new run
@@ -146,8 +208,8 @@ def load_file_from_new_recruit():
     general_counter.clear()
     units.clear()
     army_name.set("")
-    current_points.set(0)
-    army_points.set(0)
+    spent_points.set("0")
+    army_points.set("0")
 
     if os.path.exists(source_file_path):
 
@@ -166,7 +228,7 @@ def load_file_from_new_recruit():
 
 
 def load_army_from_savefile():
-    global current_points
+    global spent_points
     global army_points
     global army_name
     global units
@@ -179,8 +241,8 @@ def load_army_from_savefile():
     general_counter.clear()
     units.clear()
     army_name.set("")
-    current_points.set(0)
-    army_points.set(0)
+    spent_points.set("0")
+    army_points.set("0")
 
     if os.path.exists(savefile_path):
         data = OrderedDict()
@@ -195,9 +257,9 @@ def load_army_from_savefile():
 
                     if len(last_row) > 1:
                         army_name.set(last_row[0])
-                        current_points.set(int(last_row[1].replace("Total Points: ", "").strip()))
-                        army_points.set(int(last_row[2].replace("/", "").strip()))
-                        lost_points_total.set(int(last_row[4].strip()))
+                        spent_points.set(last_row[1].replace("Total Points: ", "").strip().rstrip('0').rstrip('.'))
+                        army_points.set(last_row[2].replace("/", "").strip().rstrip('0').rstrip('.'))
+                        lost_points_total.set(last_row[4].strip().rstrip('0').rstrip('.'))
                 for row in reader[1:-1]:
                     if len(row) < 5:
                         continue
@@ -233,7 +295,7 @@ def convert_army(json_data):
     global army_name
     global army_points
     army_name.set(json_data["roster"]["name"])
-    army_points.set(json_data["roster"]["costs"][0]["value"])
+    army_points.set(json_data["roster"]["costLimits"][0]["value"])
     army_selections = json_data["roster"]["forces"][0]["selections"]
 
     for army_selection in army_selections:
@@ -246,8 +308,8 @@ def convert_army(json_data):
     for name, value in unit_costs.items():
         print(f"{name} : {value} pts | Wound/Unit-Size : {unit_counter[name]}  | General: {general[name]}")
         units[name] = (UnitObject(name, general[name], value, unit_counter[name], 0, False, False, False))
-    spent_points = sum(unit_costs.values())
-    current_points.set(spent_points)
+    points_spent = sum(unit_costs.values())
+    spent_points.set(str(points_spent).rstrip('.0'))
     print(f"{spent_points} / {army_points.get()}")
     row_index = 1
     for name, unit in units.items():
@@ -353,7 +415,7 @@ def calculate_total_cost(army_selection):
     if isinstance(costs, list):
         for cost in costs:
             if cost["name"] == "pts":
-                total_cost += int(cost["value"])
+                total_cost += float(cost["value"])
 
     selections = army_selection.get("selections", None)
 
@@ -421,7 +483,7 @@ def check_for_general(army_selection):
 def export_to_csv():
     global army_points
     global lost_points_total
-    global current_points
+    global spent_points
     global army_name
     army_file = army_name.get() + "-Army-Overview.csv"
     directory_path = filedialog.asksaveasfilename(title="Choose a destination",
@@ -440,7 +502,7 @@ def export_to_csv():
         file.write(f"{int(unit.lost_wounds_or_models)}\n")
 
     file.write(
-        f"{army_name.get()};Total Points: {current_points.get()};/{army_points.get()};Lost:;{lost_points_total.get()};  \n")
+        f"{army_name.get()};Total Points: {spent_points.get()};/{army_points.get()};Lost:;{lost_points_total.get()};  \n")
     file.write(f"")
     success_message = f"CSV-File successfully saved to: {file_path}"
     print(success_message)
@@ -450,7 +512,7 @@ def export_to_csv():
 def export_to_json():
     global army_points
     global lost_points_total
-    global current_points
+    global spent_points
     global army_name
     global units
     army_file = "NRAE-EXPORT-" + army_name.get() + "-Army-Overview.json"
@@ -465,7 +527,7 @@ def export_to_json():
     army_data = {
         "army_name": army_name.get(),
         "army_points": army_points.get(),
-        "current_points": current_points.get(),
+        "current_points": spent_points.get(),
         "lost_points": lost_points_total.get(),
     }
 
@@ -663,7 +725,7 @@ def setup_unit_row(row, unit: UnitObject, name_entry_state="normal"):
 
     unit_name_entry.insert(0, unit.name)
     unit_name_entry.configure(state=name_entry_state)
-    unit_points_entry.insert(0, str(unit.points))
+    unit_points_entry.insert(0, str(unit.points).rstrip('0').rstrip('.'))
     unit_starting_wound_or_model_entry.insert(0, str(unit.starting_wounds_or_models))
     unit_lost_wound_or_model_entry.insert(0, str(unit.lost_wounds_or_models))
 
@@ -687,35 +749,36 @@ def setup_unit_row(row, unit: UnitObject, name_entry_state="normal"):
 
 def entry_update_unit(unit_name, entry: ctk.CTkEntry):
     global units
-
-    if entry._name == "unit_starting_wound_or_model_entry":
-        if not entry.get() == '':
-            setattr(units[unit_name], "starting_wounds_or_models", int(entry.get()))
-        else:
-            setattr(units[unit_name], "starting_wounds_or_models", 0)
-    elif entry._name == "unit_lost_wound_or_model_entry":
-        if not entry.get() == '':
-            setattr(units[unit_name], "lost_wounds_or_models", int(entry.get()))
-        else:
-            setattr(units[unit_name], "lost_wounds_or_models", 0)
-    elif entry._name == "unit_points_entry":
-        if not entry.get() == '':
-            setattr(units[unit_name], "points", int(entry.get()))
-        else:
-            setattr(units[unit_name], "points", 0)
-
+    if unit_name in units:
+        if entry._name == "unit_starting_wound_or_model_entry":
+            if not entry.get() == '':
+                setattr(units[unit_name], "starting_wounds_or_models", int(entry.get()))
+            else:
+                setattr(units[unit_name], "starting_wounds_or_models", 0)
+        elif entry._name == "unit_lost_wound_or_model_entry":
+            if not entry.get() == '':
+                setattr(units[unit_name], "lost_wounds_or_models", int(entry.get()))
+            else:
+                setattr(units[unit_name], "lost_wounds_or_models", 0)
+        elif entry._name == "unit_points_entry":
+            if not entry.get() == '':
+                setattr(units[unit_name], "points", int(entry.get()))
+            else:
+                setattr(units[unit_name], "points", 0)
     calculate_points()
 
 
 def checkbox_update_unit(unit_name, checkbox: ctk.CTkCheckBox):
-    if checkbox._name == "unit_general_checkbox":
-        setattr(units[unit_name], "is_general", bool(checkbox.get()))
-    elif checkbox._name == "unit_fleeing_checkbox":
-        setattr(units[unit_name], "is_fleeing", bool(checkbox.get()))
-    elif checkbox._name == "unit_standard_checkbox":
-        setattr(units[unit_name], "standard_lost", bool(checkbox.get()))
-    elif checkbox._name == "unit_battle_standard_checkbox":
-        setattr(units[unit_name], "battle_standard_lost", bool(checkbox.get()))
+    global units
+    if unit_name in units:
+        if checkbox._name == "unit_general_checkbox":
+            setattr(units[unit_name], "is_general", bool(checkbox.get()))
+        elif checkbox._name == "unit_fleeing_checkbox":
+            setattr(units[unit_name], "is_fleeing", bool(checkbox.get()))
+        elif checkbox._name == "unit_standard_checkbox":
+            setattr(units[unit_name], "standard_lost", bool(checkbox.get()))
+        elif checkbox._name == "unit_battle_standard_checkbox":
+            setattr(units[unit_name], "battle_standard_lost", bool(checkbox.get()))
 
     calculate_points()
 
@@ -723,11 +786,11 @@ def checkbox_update_unit(unit_name, checkbox: ctk.CTkCheckBox):
 def calculate_points():
     global lost_points_total
     global units
-    lost_points_total.set(0)
+    lost_points_total.set("0")
     for unit in units.values():
         unit.update_lost_points()
-        current_value = lost_points_total.get()
-        lost_points_total.set(current_value + unit.points_lost)
+        current_value = lost_points_total.get().rstrip('0').rstrip('.')
+        lost_points_total.set(str((current_value + unit.points_lost)).rstrip('0').rstrip('.'))
 
 
 def on_entry_change(event, unit_name, widget):
@@ -757,11 +820,11 @@ def reset_grid():
     global lost_points_total
     global army_points
     global army_name
-    global current_points
-    lost_points_total.set(0)
-    army_points.set(0)
+    global spent_points
+    lost_points_total.set("0")
+    army_points.set("0")
     army_name.set("")
-    current_points.set(0)
+    spent_points.set("")
     for widget in calculator_frame.winfo_children():
         widget.destroy()
     setup_point_calculator_header(calculator_frame)
@@ -770,57 +833,107 @@ def reset_grid():
 
 # Unit-rows for the point-calculator
 def setup_control_frame(control_frame):
-    global current_points
+    global spent_points
     global lost_points_total
     global army_points
     global army_name
+    global calculator_frame
 
     control_frame.grid_columnconfigure(0, weight=0)
     control_frame.grid_columnconfigure(1, weight=0)
-    control_frame.grid_columnconfigure(2, weight=1)
+    control_frame.grid_columnconfigure(2, weight=0)
     control_frame.grid_columnconfigure(3, weight=1)
-    control_frame.grid_columnconfigure(4, weight=0)
+    control_frame.grid_columnconfigure(4, weight=1)
     control_frame.grid_columnconfigure(5, weight=0)
     control_frame.grid_columnconfigure(6, weight=0)
     control_frame.grid_columnconfigure(7, weight=0)
     control_frame.grid_columnconfigure(8, weight=0)
     control_frame.grid_columnconfigure(9, weight=0)
+    control_frame.grid_columnconfigure(10, weight=0)
 
+    button_width = 100
+    button_height = 30
     # Left
-    add_row_button = ctk.CTkButton(control_frame, text="Add Row", height=30,
+    add_row_button = ctk.CTkButton(control_frame, text="Add Row", height=button_height, width=button_width,
                                    command=lambda: setup_unit_row(get_next_row_index(calculator_frame),
                                                                   UnitObject()))
-    add_row_button.grid(row=0, column=0, padx=5, pady=0, sticky="w")
+    add_row_button.grid(row=0, column=0, padx=2.5, pady=0, sticky="w")
 
-    reset_button = ctk.CTkButton(control_frame, text="Reset", height=30,
+    reset_button = ctk.CTkButton(control_frame, text="Reset", height=button_height, width=button_width,
                                  command=reset_grid)
-    reset_button.grid(row=0, column=1, padx=5, pady=0, sticky="w")
+    reset_button.grid(row=0, column=1, padx=2.5, pady=0, sticky="w")
+
+    load_to_units_button = ctk.CTkButton(control_frame, text="Load Army", height=button_height, width=button_width,
+                                         command=lambda: load_custom_army_to_units(calculator_frame))
+    load_to_units_button.grid(row=0, column=2, padx=2.5, sticky="w")
 
     # Middle
     army_title_label = ctk.CTkLabel(control_frame, text="Army: ")
-    army_title_label.grid(row=0, column=2, padx=5, pady=0, sticky="e")
+    army_title_label.grid(row=0, column=3, padx=5, pady=0, sticky="e")
 
     army_name_label = ctk.CTkLabel(control_frame, textvariable=army_name)
-    army_name_label.grid(row=0, column=3, padx=5, pady=0, sticky="w")
+    army_name_label.grid(row=0, column=4, padx=5, pady=0, sticky="w")
 
     # Right
-    lost_points_label = ctk.CTkLabel(control_frame, text="|  Lost: ")
-    lost_points_label.grid(row=0, column=8, padx=5, pady=0, sticky="e")
-
-    lost_points_calculated = ctk.CTkLabel(control_frame, textvariable=lost_points_total)
-    lost_points_calculated.grid(row=0, column=9, padx=5, pady=0, sticky="e")
-
     points_label = ctk.CTkLabel(control_frame, text="Army Points: ")
-    points_label.grid(row=0, column=4, padx=5, pady=0, sticky="e")
+    points_label.grid(row=0, column=5, padx=5, pady=0, sticky="e")
 
-    total_army_points = ctk.CTkLabel(control_frame, textvariable=army_points)
-    total_army_points.grid(row=0, column=7, padx=5, pady=0, sticky="w")
+    current_army_points = ctk.CTkLabel(control_frame, textvariable=spent_points)
+    current_army_points.grid(row=0, column=6, padx=5, pady=0, sticky="e")
 
     point_spacer_label = ctk.CTkLabel(control_frame, text="/")
-    point_spacer_label.grid(row=0, column=6, padx=0, pady=0, sticky="w")
+    point_spacer_label.grid(row=0, column=7, padx=0, pady=0, sticky="w")
 
-    current_army_points = ctk.CTkLabel(control_frame, textvariable=current_points)
-    current_army_points.grid(row=0, column=5, padx=5, pady=0, sticky="e")
+    total_army_points = ctk.CTkLabel(control_frame, textvariable=army_points)
+    total_army_points.grid(row=0, column=8, padx=5, pady=0, sticky="w")
+
+    lost_points_label = ctk.CTkLabel(control_frame, text="|  Lost: ")
+    lost_points_label.grid(row=0, column=9, padx=5, pady=0, sticky="e")
+
+    lost_points_calculated = ctk.CTkLabel(control_frame, textvariable=lost_points_total)
+    lost_points_calculated.grid(row=0, column=10, padx=5, pady=0, sticky="e")
+
+
+def load_custom_army_to_units(frame):
+    global units
+    global army_name
+    global army_points
+    global spent_points
+    units.clear()
+    row_index = 1
+    for row in range(row_index, (len(frame.grid_slaves()) // 8) + 1):
+        widgets_in_row = [widget for widget in frame.grid_slaves(row=row)]
+        widgets_in_row = sorted(widgets_in_row, key=lambda w: w.grid_info()["column"])
+
+        entry_widgets = [w for w in widgets_in_row if isinstance(w, ctk.CTkEntry)]
+        checkbox_widgets = [w for w in widgets_in_row if isinstance(w, ctk.CTkCheckBox)]
+
+        if len(entry_widgets) == 4 and len(checkbox_widgets) == 4:
+            name = entry_widgets[0].get()
+            points = entry_widgets[1].get()
+            starting_wounds_or_models = entry_widgets[2].get()
+            lost_wounds_or_models = entry_widgets[3].get()
+
+            is_general = checkbox_widgets[0].get()
+            is_fleeing = checkbox_widgets[1].get()
+            standard_lost = checkbox_widgets[2].get()
+            battle_standard_lost = checkbox_widgets[3].get()
+
+            if all([name, points, starting_wounds_or_models, lost_wounds_or_models]):
+                units[name] = UnitObject(name, bool(is_general), points, starting_wounds_or_models,
+                                         lost_wounds_or_models, bool(is_fleeing), bool(standard_lost),
+                                         bool(battle_standard_lost))
+                print(units[name].to_json())
+
+    dialog = ArmyDetailDialog()
+    root.wait_window(dialog.dialog_window)
+    if dialog.result:
+        army_name.set(dialog.result[0])
+        army_points.set(dialog.result[1])
+        spent_points_total = 0
+        for unit in units.values():
+            spent_points_total += float(unit.points)
+        spent_points.set(str(spent_points_total).rstrip("0").rstrip("."))
 
 
 def get_next_row_index(frame):
