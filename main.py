@@ -31,9 +31,9 @@ lost_points_total = ctk.StringVar(value="0")
 entry_after_ids = {}
 
 if getattr(sys, 'frozen', False):
-    icon_path = os.path.join(sys._MEIPASS, 'newRecruit.ico')
+    icon_path = os.path.join(sys._MEIPASS, 'whap.ico')
 else:
-    icon_path = 'newRecruit.ico'
+    icon_path = 'whap.ico'
 
 
 class ArmyDetailDialog:
@@ -559,7 +559,7 @@ def setup_menu(root_pane):
 def setup_window():
     global root
     global calculator_frame
-    root.title("NewRecruit Point Calculator")
+    root.title("Warhammer Armies Project Point Calculator")
     root.wm_iconbitmap(icon_path)
     # Sets application non-resizable
     root.resizable(False, False)

@@ -1,4 +1,4 @@
-<h1>How to use the NewRecruit-Point-Calculator.exe for Warhammer Armies Project</h1>
+<h1>How to use the Point-Calculator.exe for Warhammer Armies Project</h1>
 
 This Tool was developed, so Users of the NewRecruit Page can calculate the Battle-Result and -Losses easier.
 You can add your Army manually by opening the Application and, using the 'Add Row'-Button, add each of your Units to the
@@ -15,21 +15,22 @@ If you are using the NewRecruit Webpage, you can use the following Paragraph to 
 5. Your army should now be loaded and you can start calculating! For how to work with the calculator, refer to the next
    paragraph.
 
-<h2>How to work with the NewRecruit-Point-Calculator</h2>
+<h2>How to work with the Warhammer-Armies_Project-Point-Calculator</h2>
 
 The Calculator is split in the following columns:
 
-| **Column**                           | **Description**                                                                                                                                                                                                                                   |
-|--------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| **Name**                             | Displays the name of your units                                                                                                                                                                                                                   |
-| **General?**                         | Displays if the Unit is the General of the army                                                                                                                                                                                                   |
-| **Points**                           | Displays the total cost of the Unit                                                                                                                                                                                                               |
-| **Start-Wounds or -Models**          | Displays with how many wounds a Character and how many Models a Unit starts                                                                                                                                                                       |
-| **Lost Wounds or Models**            | Displays how many Wounds or Models a Character or Unit has lost during the engagement                                                                                                                                                             |
-| **Fleeing**                          | Calculates how many Points are gained for the Unit/Character if it's fleeing. The formula refers to the Warhammer Armies Core Rulebook, where if a unit is fleeing and at or under 50% unit strength, the unit provides 75% of their total points |
-| **Standard lost**                    | Can be checked if the Unit/Character has lost its Standard in Close Combat, adding 25 extra Points                                                                                                                                                |
-| **Battle Standard lost**             | Can be checked if the Battle Standard Bearer has lost the Battle Standard in Close Combat, adding 100 extra Points, this doesn't stack with the standard, so checking Battle-Standard for a character will be enough                              |
-| **Total Points from Unit/Character** | Calculates the total Value the enemy gained from this Unit/Character                                                                                                                                                                              |
+| **Column**                  | **Description**                                                                                                                                                                                                                                   |
+|-----------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Name**                    | Displays the name of your units                                                                                                                                                                                                                   |
+| **General?**                | Displays if the Unit is the General of the army                                                                                                                                                                                                   |
+| **Points**                  | Displays the total cost of the Unit                                                                                                                                                                                                               |
+| **Start-Wounds or -Models** | Displays with how many wounds a Character and how many Models a Unit starts                                                                                                                                                                       |
+| **Lost Wounds or Models**   | Displays how many Wounds or Models a Character or Unit has lost during the engagement                                                                                                                                                             |
+| **Fleeing**                 | Calculates how many Points are gained for the Unit/Character if it's fleeing. The formula refers to the Warhammer Armies Core Rulebook, where if a unit is fleeing and at or under 50% unit strength, the unit provides 75% of their total points |
+| **Standard lost**           | Can be checked if the Unit/Character has lost its Standard in Close Combat, adding 25 extra Points                                                                                                                                                |
+| **Battle Standard lost**    | Can be checked if the Battle Standard Bearer has lost the Battle Standard in Close Combat, adding 100 extra Points, this doesn't stack with the standard, so checking Battle-Standard for a character will be enough                              |
+| **Lost Points**             | Calculates the total Value the enemy gained from this Unit/Character                                                                                                                                                                              |
+| **Delete**                  | Offers the user to manually delete a row. It won't ask the user to confirm, so be careful!                                                                                                                                                        |
 
 By changing the checkboxes and updating the **Lost Wounds or Models**-Entries the calculator will update the **Points
 Lost**-Entry on the bottom right.
@@ -46,17 +47,17 @@ Beneath the calculator is the control-panel which provides the following utiliti
 | **Lost:**        | The calculated losses of your army                                                                          |
 
 Above the calculator is the Menu-Bar. It currently only provides a File-Menu with the following options
-| **Widgets**                      | **Description**                                                                 |
-|----------------------------------|---------------------------------------------------------------------------------|
-| **Load File**   | Loads previously saved .csv-file. |
-| **Save File**   | Saves the currently displayed army in a .csv-file |
-| **Import File** | Loads a .json which has been exported from NewRecruit Warhammer Armies Project |
-| **Export File** | Exports the currently displayed army to a custom .json for further processing if needed. This is
-final, as you currently cant load the .json back into the NewRecruit-Point-Calculator.exe |
-| **Exit**        | Exits the Application |
+
+| **Widgets**     | **Description**                                                                                                                                                             |
+|-----------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Load File**   | Loads previously saved .csv-file.                                                                                                                                           |
+| **Save File**   | Saves the currently displayed army in a .csv-file                                                                                                                           |
+| **Import File** | Loads a .json which has been exported from NewRecruit Warhammer Armies Project                                                                                              |
+| **Export File** | Exports the currently displayed army to a custom .json for further processing if needed. This is final, as you currently cant load the .json back into the Point-Calculator |
+| **Exit**        | Exits the Application                                                                                                                                                       |
 
 <h2>Contact</h2>
 
-Discord Contact for Bugs: denzel1410
+Discord Contact for Bugs: denzel1410 <br>
 This is a fan-made application. All images and logos are owned by their respective companies and only used in a
 non-commercial way.
