@@ -1,0 +1,37 @@
+name: Build Warhammer Armies Project Point Calculator
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller customtkinter CTkMenuBar darkdetect
+
+      - name: Build Executable
+        run: |
+          pyinstaller --onefile --noconsole --icon=whap.ico --add-data "customtkinter;customtkinter" --add-data "CTkMenuBar;CTkMenuBar" --add-data "darkdetect;darkdetect" main.py
+          
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Warhammer_Armies_Project_Point_Calculator
+          path: dist/Warhammer_Armies_Project_Point_Calculator.exe
