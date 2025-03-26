@@ -257,7 +257,7 @@ def load_army_from_savefile():
 
                     if len(last_row) > 1:
                         army_name.set(last_row[0])
-                        spent_points.set(last_row[1].replace("Total Points: ", "").strip().rstrip('0').rstrip('.'))
+                        spent_points.set(last_row[1].replace("Total Points: ", "").rstrip("0").rstrip("."))
                         army_points.set(last_row[2].replace("/", "").strip().rstrip('0').rstrip('.'))
                         lost_points_total.set(last_row[4].strip().rstrip('0').rstrip('.'))
                 for row in reader[1:-1]:
@@ -309,7 +309,7 @@ def convert_army(json_data):
         print(f"{name} : {value} pts | Wound/Unit-Size : {unit_counter[name]}  | General: {general[name]}")
         units[name] = (UnitObject(name, general[name], value, unit_counter[name], 0, False, False, False))
     points_spent = sum(unit_costs.values())
-    spent_points.set(str(points_spent).rstrip('.0'))
+    spent_points.set(str(points_spent).rstrip("0").rstrip("."))
     print(f"{spent_points} / {army_points.get()}")
     row_index = 1
     for name, unit in units.items():
