@@ -259,7 +259,7 @@ def load_army_from_savefile():
                         army_name.set(last_row[0])
                         spent_points.set(last_row[1].replace("Total Points: ", "").rstrip("0").rstrip("."))
                         army_points.set(last_row[2].replace("/", "").strip().rstrip('0').rstrip('.'))
-                        lost_points_total.set(last_row[4].strip().rstrip('0').rstrip('.'))
+                        lost_points_total.set(last_row[4])
                 for row in reader[1:-1]:
                     if len(row) < 5:
                         continue
@@ -814,7 +814,7 @@ def calculate_points():
         else:
             current_value = 0
         added_points = float(current_value) + float(unit.points_lost)
-        lost_points_total.set(str(added_points).rstrip('0').rstrip('.'))
+        lost_points_total.set(str(added_points))
 
 
 def on_entry_change(event, unit_name, widget):
