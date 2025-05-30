@@ -813,7 +813,8 @@ def calculate_points():
             current_value = lost_points_total.get().rstrip('0').rstrip('.')
         else:
             current_value = 0
-        lost_points_total.set(str(int(current_value) + int(unit.points_lost)).rstrip('0').rstrip('.'))
+        added_points = float(current_value) + float(unit.points_lost)
+        lost_points_total.set(str(added_points).rstrip('0').rstrip('.'))
 
 
 def on_entry_change(event, unit_name, widget):
